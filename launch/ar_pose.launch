@@ -1,0 +1,39 @@
+<launch>
+  <arg name="cam" default="fr" />
+  <arg name="record" default="false" />
+  <arg name="saveimgs" default="false" />
+  <arg name="caminfo" default="false" />
+  <arg name="id" default="2" />
+
+  <remap from="camera_image" to="/ar_image_$(arg cam)" />
+  <remap from="camera_info"  to="/cam_$(arg cam)/camera_info" />
+  <remap from="ar_pose_marker" to="/aqua2/ar_pose_marker" />
+  <remap from="visualization_marker" to="/aqua2/ar_vis_marker" />
+  <remap from="aqua_pose" to="/aqua2/pose" />
+
+  <node name="ar_republish" pkg="image_transport" type="republish" args="compressed raw">
+    <remap from="in" to="/cam_$(arg cam)/image_raw"/>
+    <remap from="out" to="/ar_image_$(arg cam)"/>
+  </node>
+
+  <node if="$(arg caminfo)" name="camera_info_pub" pkg="aqua_cl_ar" type="camera_info_pub.py" />
+
+  <node name="ar_track_$(arg cam)" pkg="ar_track_alvar" type="individualMarkersNoKinect">
+    <param name="marker_size" value="12.38" />
+    <param name="max_new_marker_error" value="0.08" />
+    <param name="max_track_error" value="0.2" />
+    <param name="output_frame" value="/cam_$(arg cam)" />
+  </node>
+
+  <node name="ar_pose_transformer" pkg="aqua_cl_ar" type="ar_pose_transformer.py" output="screen" cwd="node">
+    <param name="id" value="$(arg id)" />
+    <param name="csv_dir" value="$(find aqua_cl_ar)/data" />
+  </node>
+
+  <node if="$(arg saveimgs)" name="extract_images" pkg="aqua_cl_ar" type="extract_images.py" output="screen" cwd="node">
+    <param name="image_dir" value="$(find aqua_cl_ar)/data/images" />
+  </node>
+
+  <node if="$(arg record)" name="aqua_cl_record" pkg="rosbag" type="record"
+    args="record -o $(find aqua_cl_ar)/data/ar_marker_$(arg id) /aqua2/ar_pose_marker /aqua2/ar_vis_marker /aqua2/pose /cam_$(arg cam)/camera_info" />
+</launch>
