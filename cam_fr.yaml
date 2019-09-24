@@ -1,0 +1,12 @@
+camera_matrix:
+  data: [1138.63342406, 0.0, 720.18126274, 0.0, 1138.77461325, 602.90654942, 0.0, 0.0, 1.0]
+camera_name: cam_fr
+distortion_coefficients:
+  data: [0.0, 0.0, 0.0, 0.0, 0.0]
+distortion_model: plumb_bob
+image_height: 1200
+image_width: 1600
+projection_matrix:
+  data: [1138.63342406, 0.0, 720.18126274, 0.0, 0.0, 1138.77461325, 602.90654942, 0.0, 0.0, 0.0, 1.0, 0.0]
+rectification_matrix:
+  data: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]

@@ -2,7 +2,6 @@
   <arg name="cam" default="fr" />
   <arg name="record" default="false" />
   <arg name="saveimgs" default="false" />
-  <arg name="caminfo" default="false" />
   <arg name="id" default="2" />
 
   <remap from="camera_image" to="/ar_image_$(arg cam)" />
@@ -11,12 +10,10 @@
   <remap from="visualization_marker" to="/aqua2/ar_vis_marker" />
   <remap from="aqua_pose" to="/aqua2/pose" />
 
-  <node name="ar_republish" pkg="image_transport" type="republish" args="compressed raw">
+  <node name="ar_republish" pkg="image_transport" type="republish" args="raw raw">
     <remap from="in" to="/cam_$(arg cam)/image_raw"/>
     <remap from="out" to="/ar_image_$(arg cam)"/>
   </node>
-
-  <node if="$(arg caminfo)" name="camera_info_pub" pkg="aqua_cl_ar" type="camera_info_pub.py" />
 
   <node name="ar_track_$(arg cam)" pkg="ar_track_alvar" type="individualMarkersNoKinect">
     <param name="marker_size" value="12.38" />
@@ -36,4 +33,14 @@
 
   <node if="$(arg record)" name="aqua_cl_record" pkg="rosbag" type="record"
     args="record -o $(find aqua_cl_ar)/data/ar_marker_$(arg id) /aqua2/ar_pose_marker /aqua2/ar_vis_marker /aqua2/pose /cam_$(arg cam)/camera_info" />
+
+  <node name="cl_image_repub" pkg="bag_tools" type="image_sequence_publisher.py" output="screen">
+    <param name="image_dir" value="/home/hdamron/Downloads/DeepCL-ICRA-2020/images"/>
+    <param name="file_pattern" value="*.jpeg"/>
+    <param name="camera_info_file" value="$(find aqua_cl_ar)/cam_fr.yaml"/>
+    <param name="frequency" value="8"/>
+    <remap from="/camera/image_color" to="/cam_$(arg cam)/image_raw" />
+    <remap from="/camera/camera_info" to="camera_info" />
+  </node>
+  <node name="cl_tf_remap" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 1 /camera /cam_$(arg cam) 100" />
 </launch>

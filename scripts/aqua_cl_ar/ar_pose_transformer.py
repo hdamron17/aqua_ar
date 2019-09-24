@@ -11,7 +11,7 @@ import os, os.path
 import time
 import csv
 
-ar_to_base = ([0, -(0.125/5 + 0.044 - 0.004 + 0.126/2), 0.49/2], pytf.quaternion_from_euler(0, pi/2, pi/2))
+ar_to_base = ([0, -(0.125/5 + 0.044 - 0.004 + 0.126/2)-0.03, 0.49/2 - 0.02], pytf.quaternion_from_euler(0, 93*pi/180, pi/2))
 
 def msg2tf(msg):
     p, q = msg.position, msg.orientation
